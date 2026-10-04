@@ -1,325 +1,3251 @@
 <!doctype html>
 <html lang="de">
+
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Museum Wolfenbüttel – Ausstellungssteuerung</title>
+
+<title>Museum Wolfenbüttel – Bürger Vitrine</title>
+
 <style>
+
 :root{
-  --bg:#eef2f5;--card:#fff;--text:#1c2732;--muted:#6b7885;--border:#dce3e8;
-  --green:#238b57;--red:#a63b3b;--blue:#315f76;--amber:#ad741f;--soft:#f7f9fa;
-  --shadow:0 18px 48px rgba(25,40,55,.10)
+
+  /* Grundfarben */
+  --bg:#f2eee6;
+  --bg-light:#fbfaf7;
+  --surface:#ffffff;
+  --text:#262522;
+  --muted:#7b766f;
+  --border:#ded8ce;
+
+  /* Bürger Museum / RAL-6005-Nähe */
+  --green:#0f4336;
+  --green-mid:#175847;
+  --green-light:#e8f1ed;
+  --green-dark:#082d24;
+
+  /* Schloss / Weinrot */
+  --wine:#742b40;
+  --wine-light:#f3e9ec;
+  --wine-dark:#501928;
+
+  /* Gold / reguläre Planung */
+  --gold:#ae8a4a;
+  --gold-light:#f7f1e4;
+  --gold-dark:#765b2c;
+
+  /* Blau / Automatik */
+  --blue:#365d6c;
+  --blue-light:#e9f0f3;
+  --blue-dark:#274653;
+
+  /* Funktionen */
+  --red:#9f3e42;
+  --red-dark:#742b2e;
+  --grey:#58646d;
+
+  --shadow:0 18px 42px rgba(52,43,34,.10);
+  --shadow-strong:0 24px 58px rgba(52,43,34,.16);
 }
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;font-family:Segoe UI,Arial,sans-serif;background:linear-gradient(180deg,#edf2f5,#fafbfc 44%,#edf1f4);color:var(--text)}
-.wrap{max-width:1080px;margin:auto;padding:34px 20px 60px}
-header{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:20px}
-h1{margin:0 0 4px;font-size:30px;font-weight:650}.sub{color:var(--muted)}
-.badge{background:#fff;border:1px solid var(--border);border-radius:999px;padding:9px 13px;color:var(--muted);font-size:13px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:18px}
-.cardhead{padding:20px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:15px}
-.title{font-size:21px;font-weight:650}.small{font-size:13px;color:var(--muted);margin-top:4px}
-.state{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:650}
-.dot{width:12px;height:12px;border-radius:50%;background:#aab3bc}.dot.on{background:var(--green)}.dot.off{background:#7b8791}.dot.err{background:var(--red)}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:18px 22px}
-.metric{background:var(--soft);border:1px solid var(--border);border-radius:14px;padding:14px}.label{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:7px}.value{font-size:23px;font-weight:650}.unit{font-size:14px;color:var(--muted);font-weight:500}
-.controls{padding:0 22px 22px;display:grid;grid-template-columns:1fr 1fr 150px;gap:10px}
-button{border:0;border-radius:12px;padding:12px 14px;font-size:15px;font-weight:650;cursor:pointer}
-button:disabled{opacity:.45;cursor:default}.green{background:var(--green);color:#fff}.dark{background:#4a5966;color:#fff}.blue{background:var(--blue);color:#fff}.light{background:#e9f0f4;color:#294e61}.red{background:#a63b3b;color:#fff}.amber{background:#f4ead9;color:#6f4a14}
-.msg{margin:0 22px 20px;padding:11px 13px;border-radius:11px;background:#f3f7f9;color:var(--muted);font-size:14px}.msg.error{background:#fff0f0;color:#963838}.msg.warn{background:#fff6e8;color:#84591b}
-.login{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:18px}.loginrow{display:flex;gap:10px}.login input{flex:1}
-.section{padding:20px 22px}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-input,select{border:1px solid var(--border);border-radius:10px;padding:10px 11px;font-size:14px;background:#fff;color:var(--text)}
-input[type="time"]{min-width:110px} input[type="date"]{min-width:145px}
-.switchline{display:flex;align-items:center;gap:10px}.switchline input{width:18px;height:18px}
-table{width:100%;border-collapse:collapse}
-th,td{padding:11px 8px;border-bottom:1px solid var(--border);text-align:left;font-size:14px}
-th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.45px}
-.center{text-align:center}.actions{display:flex;gap:8px;justify-content:flex-end}
-.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-.statuspill{padding:7px 10px;border-radius:999px;background:#edf3f6;color:#35536a;font-size:13px}
-.gridform{display:grid;grid-template-columns:1.1fr .8fr .8fr 1fr 1.4fr auto;gap:10px;align-items:end}
-.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
-.field input,.field select{width:100%}
-.empty{padding:18px;color:var(--muted);text-align:center}
-.preview{padding:12px 14px;border-radius:12px;background:#f7f9fa;border:1px solid var(--border);font-size:14px;color:#44525f}
-.mini{font-size:12px;color:var(--muted)}
-@media(max-width:800px){
-  header{align-items:flex-start;flex-direction:column}.metrics{grid-template-columns:1fr 1fr}.controls{grid-template-columns:1fr 1fr}.controls .light{grid-column:1/-1}
-  .gridform{grid-template-columns:1fr 1fr}.gridform .wide{grid-column:1/-1}.gridform button{grid-column:1/-1}
-  table{display:block;overflow-x:auto;white-space:nowrap}
+
+
+/* --------------------------------------------------
+   BASIS
+-------------------------------------------------- */
+
+*{
+  box-sizing:border-box;
 }
+
+html,
+body{
+  margin:0;
+  min-height:100%;
+}
+
+body{
+
+  min-height:100vh;
+
+  font-family:
+    "Segoe UI",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+
+  color:var(--text);
+
+  background:
+
+    radial-gradient(
+      circle at 15% 8%,
+      rgba(255,255,255,.95),
+      transparent 34%
+    ),
+
+    radial-gradient(
+      circle at 90% 90%,
+      rgba(15,67,54,.04),
+      transparent 30%
+    ),
+
+    linear-gradient(
+      145deg,
+      #ebe5da,
+      var(--bg-light) 48%,
+      #eee8df
+    );
+
+  padding:28px;
+}
+
+
+/* --------------------------------------------------
+   MUSEUMSRAHMEN
+-------------------------------------------------- */
+
+.frame-outer{
+
+  position:fixed;
+
+  top:17px;
+  left:17px;
+  right:17px;
+  bottom:17px;
+
+  border:
+    1px solid rgba(98,82,61,.19);
+
+  border-radius:20px;
+
+  pointer-events:none;
+
+  z-index:50;
+}
+
+.frame-inner{
+
+  position:fixed;
+
+  top:25px;
+  left:25px;
+  right:25px;
+  bottom:25px;
+
+  border:
+    1px solid rgba(174,138,74,.13);
+
+  border-radius:15px;
+
+  pointer-events:none;
+
+  z-index:50;
+}
+
+
+/* --------------------------------------------------
+   HAUPTBEREICH
+-------------------------------------------------- */
+
+.wrap{
+
+  width:min(1180px,100%);
+
+  margin:0 auto;
+
+  padding:
+    34px
+    18px
+    70px;
+}
+
+
+/* --------------------------------------------------
+   NAVIGATION OBEN
+-------------------------------------------------- */
+
+.topbar{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:18px;
+
+  margin-bottom:24px;
+}
+
+.breadcrumb{
+
+  color:var(--muted);
+
+  font-size:13px;
+
+  letter-spacing:.15px;
+}
+
+.breadcrumb strong{
+
+  color:var(--green);
+
+  font-weight:700;
+}
+
+.back-button{
+
+  min-width:135px;
+
+  height:45px;
+
+  border:
+    1px solid rgba(90,78,62,.16);
+
+  border-radius:14px;
+
+  padding:0 20px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff,
+      #ece7df
+    );
+
+  color:#504b45;
+
+  font-size:14px;
+
+  font-weight:650;
+
+  cursor:pointer;
+
+  box-shadow:
+
+    0 4px 0 #d1cbc1,
+
+    0 8px 18px
+    rgba(57,45,34,.10);
+
+  transition:
+    transform .12s ease,
+    box-shadow .12s ease;
+}
+
+.back-button:hover{
+
+  transform:translateY(-1px);
+}
+
+.back-button:active{
+
+  transform:translateY(4px);
+
+  box-shadow:
+    0 1px 0 #d1cbc1,
+    0 4px 8px rgba(57,45,34,.08);
+}
+
+
+/* --------------------------------------------------
+   HERO / AKTUELLER BEREICH
+-------------------------------------------------- */
+
+.hero{
+
+  position:relative;
+
+  overflow:hidden;
+
+  border-radius:27px;
+
+  padding:
+    31px
+    34px;
+
+  margin-bottom:22px;
+
+  color:#fff;
+
+  background:
+
+    radial-gradient(
+      circle at 5% 0%,
+      rgba(255,255,255,.18),
+      transparent 30%
+    ),
+
+    linear-gradient(
+      135deg,
+      #1b5b4a,
+      var(--green) 60%,
+      #0b362c
+    );
+
+  box-shadow:
+
+    0 10px 0 var(--green-dark),
+
+    0 26px 50px
+    rgba(10,55,44,.20),
+
+    inset 0 1px 1px
+    rgba(255,255,255,.18);
+}
+
+.hero::after{
+
+  content:"";
+
+  position:absolute;
+
+  top:11px;
+  left:11px;
+  right:11px;
+  bottom:11px;
+
+  border:
+    1px solid rgba(255,255,255,.14);
+
+  border-radius:19px;
+
+  pointer-events:none;
+}
+
+.hero-inner{
+
+  position:relative;
+
+  z-index:2;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:24px;
+}
+
+.hero-eyebrow{
+
+  text-transform:uppercase;
+
+  font-size:12px;
+
+  font-weight:700;
+
+  letter-spacing:2.5px;
+
+  opacity:.72;
+
+  margin-bottom:7px;
+}
+
+.hero h1{
+
+  margin:0;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:37px;
+
+  font-weight:500;
+
+  letter-spacing:-.3px;
+}
+
+.hero-sub{
+
+  margin-top:8px;
+
+  font-size:14px;
+
+  opacity:.73;
+}
+
+
+/* Status oben */
+
+.hero-state{
+
+  min-width:180px;
+
+  padding:
+    16px
+    20px;
+
+  border-radius:18px;
+
+  text-align:center;
+
+  background:
+    rgba(255,255,255,.11);
+
+  border:
+    1px solid rgba(255,255,255,.15);
+
+  backdrop-filter:blur(4px);
+}
+
+.state-label{
+
+  font-size:11px;
+
+  letter-spacing:1.6px;
+
+  text-transform:uppercase;
+
+  opacity:.7;
+
+  margin-bottom:8px;
+}
+
+.state{
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  gap:10px;
+
+  font-size:20px;
+
+  font-weight:700;
+}
+
+.dot{
+
+  width:13px;
+  height:13px;
+
+  border-radius:50%;
+
+  background:#c4cac7;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(255,255,255,.07);
+}
+
+.dot.on{
+
+  background:#73dfa9;
+
+  box-shadow:
+    0 0 0 4px rgba(115,223,169,.12),
+    0 0 16px rgba(115,223,169,.50);
+}
+
+.dot.off{
+
+  background:#d6d7d4;
+}
+
+.dot.err{
+
+  background:#ff9393;
+
+  box-shadow:
+    0 0 0 4px rgba(255,147,147,.12);
+}
+
+
+/* --------------------------------------------------
+   ALLGEMEINE KARTEN
+-------------------------------------------------- */
+
+.card{
+
+  position:relative;
+
+  overflow:hidden;
+
+  background:
+    rgba(255,255,255,.94);
+
+  border:
+    1px solid var(--border);
+
+  border-radius:24px;
+
+  box-shadow:var(--shadow);
+
+  margin-bottom:20px;
+
+  transition:
+    box-shadow .18s ease,
+    border-color .18s ease,
+    transform .18s ease;
+}
+
+
+/* aktive Arbeitszone optisch betonen */
+
+.card:focus-within{
+
+  box-shadow:var(--shadow-strong);
+
+  transform:translateY(-1px);
+}
+
+
+/* Farbbalken links */
+
+.card.control-card{
+  border-left:6px solid var(--green);
+}
+
+.card.auto-card{
+  border-left:6px solid var(--blue);
+}
+
+.card.regular-card{
+  border-left:6px solid var(--gold);
+}
+
+.card.individual-card{
+  border-left:6px solid var(--wine);
+}
+
+
+/* --------------------------------------------------
+   KARTENÜBERSCHRIFT
+-------------------------------------------------- */
+
+.cardhead{
+
+  padding:
+    20px
+    23px;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:16px;
+
+  border-bottom:
+    1px solid var(--border);
+}
+
+.cardhead.green-head{
+  background:
+    linear-gradient(
+      90deg,
+      var(--green-light),
+      #fff 72%
+    );
+}
+
+.cardhead.blue-head{
+  background:
+    linear-gradient(
+      90deg,
+      var(--blue-light),
+      #fff 72%
+    );
+}
+
+.cardhead.gold-head{
+  background:
+    linear-gradient(
+      90deg,
+      var(--gold-light),
+      #fff 72%
+    );
+}
+
+.cardhead.wine-head{
+  background:
+    linear-gradient(
+      90deg,
+      var(--wine-light),
+      #fff 72%
+    );
+}
+
+.title{
+
+  font-size:21px;
+
+  font-weight:700;
+}
+
+.small{
+
+  margin-top:4px;
+
+  color:var(--muted);
+
+  font-size:13px;
+}
+
+
+/* --------------------------------------------------
+   METRIKEN
+-------------------------------------------------- */
+
+.metrics{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(4,1fr);
+
+  gap:14px;
+
+  padding:
+    22px
+    23px;
+}
+
+.metric{
+
+  position:relative;
+
+  overflow:hidden;
+
+  padding:
+    17px
+    16px;
+
+  border-radius:16px;
+
+  border:
+    1px solid #e1ddd6;
+
+  background:
+
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #f5f3ef
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 5px 12px rgba(55,46,37,.05);
+}
+
+.metric::before{
+
+  content:"";
+
+  position:absolute;
+
+  top:0;
+  left:0;
+  right:0;
+
+  height:3px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--green),
+      transparent
+    );
+}
+
+.label{
+
+  margin-bottom:8px;
+
+  color:var(--muted);
+
+  font-size:11px;
+
+  font-weight:700;
+
+  letter-spacing:.7px;
+
+  text-transform:uppercase;
+}
+
+.value{
+
+  font-size:27px;
+
+  font-weight:700;
+
+  letter-spacing:-.5px;
+
+  color:#252a27;
+}
+
+.unit{
+
+  font-size:14px;
+
+  font-weight:500;
+
+  color:var(--muted);
+}
+
+
+/* --------------------------------------------------
+   MANUELLE STEUERUNG
+-------------------------------------------------- */
+
+.controls{
+
+  display:grid;
+
+  grid-template-columns:
+    1fr
+    1fr
+    180px;
+
+  gap:12px;
+
+  padding:
+    0
+    23px
+    23px;
+}
+
+button{
+
+  font-family:inherit;
+}
+
+
+/* Basis für große Steuerknöpfe */
+
+.action-button{
+
+  height:57px;
+
+  border:0;
+
+  border-radius:17px;
+
+  padding:0 22px;
+
+  font-size:16px;
+
+  font-weight:750;
+
+  cursor:pointer;
+
+  transition:
+    transform .12s ease,
+    box-shadow .12s ease,
+    filter .12s ease;
+}
+
+.action-button:hover:not(:disabled){
+
+  transform:translateY(-2px);
+
+  filter:brightness(1.035);
+}
+
+.action-button:active:not(:disabled){
+
+  transform:translateY(5px);
+}
+
+.action-button:disabled{
+
+  opacity:.42;
+
+  cursor:default;
+}
+
+
+/* EIN */
+
+.green{
+
+  color:white;
+
+  background:
+    linear-gradient(
+      180deg,
+      #28785e,
+      var(--green)
+    );
+
+  box-shadow:
+    0 6px 0 var(--green-dark),
+    0 10px 20px rgba(15,67,54,.18),
+    inset 0 1px 1px rgba(255,255,255,.24);
+}
+
+
+/* AUS */
+
+.dark{
+
+  color:white;
+
+  background:
+    linear-gradient(
+      180deg,
+      #68737a,
+      #4b565d
+    );
+
+  box-shadow:
+    0 6px 0 #374047,
+    0 10px 20px rgba(55,64,71,.16),
+    inset 0 1px 1px rgba(255,255,255,.18);
+}
+
+
+/* Aktualisieren */
+
+.light{
+
+  color:#31535d;
+
+  background:
+    linear-gradient(
+      180deg,
+      #eff5f6,
+      #dce8eb
+    );
+
+  border:
+    1px solid #cfdee2;
+
+  box-shadow:
+    0 5px 0 #bdced2,
+    0 9px 17px rgba(46,72,80,.10);
+}
+
+
+/* --------------------------------------------------
+   STATUSMELDUNG
+-------------------------------------------------- */
+
+.msg{
+
+  margin:
+    0
+    23px
+    22px;
+
+  padding:
+    12px
+    14px;
+
+  border-radius:12px;
+
+  background:#f2f6f4;
+
+  border:
+    1px solid #e0e9e4;
+
+  color:#62706a;
+
+  font-size:14px;
+}
+
+.msg.error{
+
+  background:#fff0f0;
+
+  border-color:#f1d2d2;
+
+  color:#963838;
+}
+
+.msg.warn{
+
+  background:#fff7e9;
+
+  border-color:#eddcb7;
+
+  color:#80591e;
+}
+
+
+/* --------------------------------------------------
+   AUTOMATIK
+-------------------------------------------------- */
+
+.scheduler-switch{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  padding:
+    8px
+    13px;
+
+  border-radius:12px;
+
+  background:#fff;
+
+  border:
+    1px solid rgba(54,93,108,.16);
+}
+
+.scheduler-switch input{
+
+  width:20px;
+  height:20px;
+
+  accent-color:var(--blue);
+}
+
+.scheduler-switch strong{
+
+  min-width:28px;
+
+  color:var(--blue-dark);
+}
+
+
+/* --------------------------------------------------
+   SEKTION
+-------------------------------------------------- */
+
+.section{
+
+  padding:
+    21px
+    23px;
+}
+
+.preview{
+
+  padding:
+    15px
+    17px;
+
+  border-radius:14px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #f7fafb,
+      #eef4f6
+    );
+
+  border:
+    1px solid #dce7eb;
+
+  color:#3e535c;
+
+  font-size:14px;
+}
+
+
+/* --------------------------------------------------
+   TABELLEN
+-------------------------------------------------- */
+
+table{
+
+  width:100%;
+
+  border-collapse:collapse;
+}
+
+th,
+td{
+
+  padding:
+    12px
+    9px;
+
+  border-bottom:
+    1px solid #e5e1da;
+
+  text-align:left;
+
+  font-size:14px;
+}
+
+th{
+
+  color:var(--muted);
+
+  font-size:11px;
+
+  font-weight:700;
+
+  text-transform:uppercase;
+
+  letter-spacing:.7px;
+}
+
+tbody tr{
+
+  transition:
+    background .13s ease;
+}
+
+tbody tr:hover{
+
+  background:#faf8f4;
+}
+
+.center{
+
+  text-align:center;
+}
+
+
+/* --------------------------------------------------
+   FORMULARE
+-------------------------------------------------- */
+
+input,
+select{
+
+  border:
+    1px solid #d8d2c9;
+
+  border-radius:11px;
+
+  padding:
+    10px
+    11px;
+
+  background:#fff;
+
+  color:var(--text);
+
+  font-size:14px;
+
+  outline:none;
+
+  transition:
+    border-color .15s ease,
+    box-shadow .15s ease;
+}
+
+input:focus,
+select:focus{
+
+  border-color:
+    rgba(116,43,64,.55);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(116,43,64,.08);
+}
+
+input[type="time"]{
+  min-width:110px;
+}
+
+input[type="date"]{
+  min-width:145px;
+}
+
+input[type="checkbox"]{
+  accent-color:var(--green);
+}
+
+
+/* --------------------------------------------------
+   REGELMÄSSIG SPEICHERN
+-------------------------------------------------- */
+
+.save-regular{
+
+  min-width:125px;
+
+  height:43px;
+
+  border:0;
+
+  border-radius:13px;
+
+  padding:0 18px;
+
+  color:white;
+
+  background:
+    linear-gradient(
+      180deg,
+      #bf9c5d,
+      var(--gold)
+    );
+
+  font-weight:700;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 5px 0 var(--gold-dark),
+    0 9px 17px rgba(118,91,44,.15);
+}
+
+.save-regular:active:not(:disabled){
+
+  transform:translateY(4px);
+
+  box-shadow:
+    0 1px 0 var(--gold-dark),
+    0 4px 8px rgba(118,91,44,.12);
+}
+
+.save-regular:disabled{
+
+  opacity:.42;
+}
+
+
+/* --------------------------------------------------
+   INDIVIDUELLES FORMULAR
+-------------------------------------------------- */
+
+.gridform{
+
+  display:grid;
+
+  grid-template-columns:
+    1.05fr
+    .8fr
+    .8fr
+    .9fr
+    1.4fr
+    auto;
+
+  gap:11px;
+
+  align-items:end;
+}
+
+.field label{
+
+  display:block;
+
+  margin-bottom:6px;
+
+  color:var(--muted);
+
+  font-size:12px;
+
+  font-weight:650;
+}
+
+.field input,
+.field select{
+
+  width:100%;
+}
+
+.add-button{
+
+  min-width:155px;
+
+  height:42px;
+
+  border:0;
+
+  border-radius:12px;
+
+  padding:0 16px;
+
+  color:white;
+
+  background:
+    linear-gradient(
+      180deg,
+      #894056,
+      var(--wine)
+    );
+
+  font-weight:700;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 5px 0 var(--wine-dark),
+    0 9px 17px rgba(116,43,64,.15);
+}
+
+.add-button:active:not(:disabled){
+
+  transform:translateY(4px);
+
+  box-shadow:
+    0 1px 0 var(--wine-dark),
+    0 4px 8px rgba(116,43,64,.10);
+}
+
+.add-button:disabled{
+
+  opacity:.42;
+}
+
+
+/* --------------------------------------------------
+   INDIVIDUELLE LISTE
+-------------------------------------------------- */
+
+.toolbar{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:12px;
+
+  flex-wrap:wrap;
+
+  margin-bottom:14px;
+}
+
+.mini{
+
+  color:var(--muted);
+
+  font-size:12px;
+}
+
+.empty{
+
+  padding:20px;
+
+  color:var(--muted);
+
+  text-align:center;
+}
+
+.actions{
+
+  display:flex;
+
+  justify-content:flex-end;
+
+  gap:8px;
+}
+
+.delete-button{
+
+  border:0;
+
+  border-radius:10px;
+
+  padding:
+    8px
+    12px;
+
+  color:white;
+
+  background:var(--red);
+
+  font-size:13px;
+
+  font-weight:650;
+
+  cursor:pointer;
+}
+
+
+/* --------------------------------------------------
+   AKTUALISIERUNG OBEN
+-------------------------------------------------- */
+
+.updated{
+
+  margin-top:12px;
+
+  color:rgba(255,255,255,.65);
+
+  font-size:12px;
+}
+
+
+/* --------------------------------------------------
+   FOOTER
+-------------------------------------------------- */
+
+.footer{
+
+  margin-top:35px;
+
+  color:#a49c91;
+
+  text-align:center;
+
+  font-size:11px;
+
+  letter-spacing:.4px;
+}
+
+
+/* --------------------------------------------------
+   RESPONSIVE
+-------------------------------------------------- */
+
+@media(max-width:900px){
+
+  .metrics{
+
+    grid-template-columns:
+      1fr
+      1fr;
+  }
+
+  .controls{
+
+    grid-template-columns:
+      1fr
+      1fr;
+  }
+
+  .controls .light{
+
+    grid-column:
+      1 / -1;
+  }
+
+  .gridform{
+
+    grid-template-columns:
+      1fr
+      1fr;
+  }
+
+  .gridform .wide{
+
+    grid-column:
+      1 / -1;
+  }
+
+  .gridform button{
+
+    grid-column:
+      1 / -1;
+
+    width:100%;
+  }
+}
+
+
+@media(max-width:650px){
+
+  body{
+
+    padding:15px;
+  }
+
+  .frame-outer{
+
+    top:7px;
+    left:7px;
+    right:7px;
+    bottom:7px;
+  }
+
+  .frame-inner{
+
+    top:13px;
+    left:13px;
+    right:13px;
+    bottom:13px;
+  }
+
+  .wrap{
+
+    padding:
+      25px
+      8px
+      55px;
+  }
+
+  .topbar{
+
+    align-items:flex-start;
+
+    flex-direction:column-reverse;
+  }
+
+  .back-button{
+
+    width:100%;
+  }
+
+  .hero{
+
+    padding:
+      27px
+      23px;
+  }
+
+  .hero-inner{
+
+    align-items:flex-start;
+
+    flex-direction:column;
+  }
+
+  .hero-state{
+
+    width:100%;
+  }
+
+  .hero h1{
+
+    font-size:31px;
+  }
+
+  .metrics{
+
+    grid-template-columns:1fr;
+  }
+
+  .controls{
+
+    grid-template-columns:1fr;
+  }
+
+  .controls .light{
+
+    grid-column:auto;
+  }
+
+  .cardhead{
+
+    align-items:flex-start;
+
+    flex-direction:column;
+  }
+
+  table{
+
+    display:block;
+
+    overflow-x:auto;
+
+    white-space:nowrap;
+  }
+
+  .gridform{
+
+    grid-template-columns:1fr;
+  }
+
+  .gridform .wide,
+  .gridform button{
+
+    grid-column:auto;
+  }
+}
+
 </style>
+
 </head>
+
+
 <body>
+
+<div class="frame-outer"></div>
+<div class="frame-inner"></div>
+
+
 <div class="wrap">
-<header>
-  <div><h1>Ausstellungssteuerung</h1><div class="sub">Museum Wolfenbüttel · Bürger Vitrine</div></div>
-  <div class="badge" id="updated">Noch nicht verbunden</div>
-</header>
 
-<section class="login">
-  <div class="loginrow">
-    <input id="pin" type="password" inputmode="numeric" placeholder="PANEL_PIN">
-    <button class="blue" onclick="connect()">Verbinden</button>
-  </div>
-</section>
 
-<section class="card">
-  <div class="cardhead">
-    <div><div class="title">Bürger Vitrine</div><div class="small">Shelly Plug M Gen3 · Cloud</div></div>
-    <div class="state"><span class="dot" id="dot"></span><span id="state">GESPERRT</span></div>
-  </div>
-  <div class="metrics">
-    <div class="metric"><div class="label">Leistung</div><div class="value"><span id="power">–</span> <span class="unit">W</span></div></div>
-    <div class="metric"><div class="label">Spannung</div><div class="value"><span id="voltage">–</span> <span class="unit">V</span></div></div>
-    <div class="metric"><div class="label">Strom</div><div class="value"><span id="current">–</span> <span class="unit">A</span></div></div>
-    <div class="metric"><div class="label">Temperatur</div><div class="value"><span id="temp">–</span> <span class="unit">°C</span></div></div>
-  </div>
-  <div class="controls">
-    <button class="green" id="onBtn" onclick="switchPower(true)" disabled>EIN</button>
-    <button class="dark" id="offBtn" onclick="switchPower(false)" disabled>AUS</button>
-    <button class="light" id="refreshBtn" onclick="refreshAll()" disabled>Aktualisieren</button>
-  </div>
-  <div class="msg" id="msg">Bitte PANEL_PIN eingeben.</div>
-</section>
+<!-- NAVIGATION -->
 
-<section class="card">
-  <div class="cardhead">
-    <div><div class="title">Automatische Programmierung</div><div class="small">Zeitzone: Europe/Berlin</div></div>
-    <label class="switchline">
-      <input type="checkbox" id="schedulerEnabled" onchange="toggleScheduler()" disabled>
-      <strong id="schedulerLabel">AUS</strong>
-    </label>
-  </div>
-  <div class="section">
-    <div class="preview" id="preview">Aktueller Programmzustand wird nach der Verbindung angezeigt.</div>
-  </div>
-</section>
+<div class="topbar">
 
-<section class="card">
-  <div class="cardhead">
-    <div><div class="title">Regelmäßige Programmierung</div><div class="small">Für jeden Wochentag frei einstellbar, inklusive Minuten</div></div>
-    <button class="blue" id="saveRegularBtn" onclick="saveRegular()" disabled>Speichern</button>
-  </div>
-  <div class="section">
-    <table>
-      <thead><tr><th>Tag</th><th class="center">Aktiv</th><th>EIN</th><th>AUS</th></tr></thead>
-      <tbody id="regularBody"></tbody>
-    </table>
-  </div>
-</section>
+  <div class="breadcrumb">
 
-<section class="card">
-  <div class="cardhead">
-    <div><div class="title">Individuelle Programmierung</div><div class="small">Einmalige Termine. Individuelle Regeln haben Vorrang.</div></div>
+    Museum Wolfenbüttel
+    &nbsp;›&nbsp;
+    <strong>Bürger Museum</strong>
+    &nbsp;›&nbsp;
+    Bürger Vitrine
+
   </div>
-  <div class="section">
-    <div class="gridform">
-      <div class="field"><label>Datum</label><input id="indDate" type="date"></div>
-      <div class="field"><label>Von</label><input id="indStart" type="time" value="19:00"></div>
-      <div class="field"><label>Bis</label><input id="indEnd" type="time" value="20:30"></div>
-      <div class="field"><label>Zustand</label><select id="indState"><option value="on">EIN</option><option value="off">AUS</option></select></div>
-      <div class="field wide"><label>Notiz (optional)</label><input id="indNote" maxlength="200" placeholder="z. B. Abendveranstaltung"></div>
-      <button class="blue" id="addIndividualBtn" onclick="addIndividual()" disabled>Termin hinzufügen</button>
-    </div>
-    <div id="conflictBox" class="msg" style="display:none;margin:14px 0 0"></div>
-  </div>
-  <div class="section" style="padding-top:0">
-    <div class="toolbar"><strong>Geplante Termine</strong><span class="mini">Abgelaufene Termine werden automatisch gelöscht.</span></div>
-    <div id="individualList"><div class="empty">Noch keine Termine geladen.</div></div>
-  </div>
-</section>
+
+
+  <button
+    class="back-button"
+    onclick="location.href='museen.html'">
+
+    ← Zurück
+
+  </button>
+
 </div>
 
+
+
+<!-- HERO -->
+
+<section class="hero">
+
+  <div class="hero-inner">
+
+    <div>
+
+      <div class="hero-eyebrow">
+        Bürger Museum
+      </div>
+
+      <h1>
+        Bürger Vitrine
+      </h1>
+
+      <div class="hero-sub">
+        Shelly Plug M Gen3 · Cloud-Steuerung
+      </div>
+
+      <div
+        class="updated"
+        id="updated">
+
+        Verbindung wird hergestellt …
+
+      </div>
+
+    </div>
+
+
+    <div class="hero-state">
+
+      <div class="state-label">
+        Aktueller Zustand
+      </div>
+
+      <div class="state">
+
+        <span
+          class="dot"
+          id="dot">
+        </span>
+
+        <span id="state">
+          VERBINDUNG …
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- MANUELLE STEUERUNG -->
+
+<section
+  class="card control-card">
+
+  <div
+    class="cardhead green-head">
+
+    <div>
+
+      <div class="title">
+        Aktuelle Steuerung
+      </div>
+
+      <div class="small">
+        Zustand und Verbrauch der Bürger Vitrine
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="metrics">
+
+    <div class="metric">
+
+      <div class="label">
+        Leistung
+      </div>
+
+      <div class="value">
+
+        <span id="power">–</span>
+
+        <span class="unit">
+          W
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="metric">
+
+      <div class="label">
+        Spannung
+      </div>
+
+      <div class="value">
+
+        <span id="voltage">–</span>
+
+        <span class="unit">
+          V
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="metric">
+
+      <div class="label">
+        Strom
+      </div>
+
+      <div class="value">
+
+        <span id="current">–</span>
+
+        <span class="unit">
+          A
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="metric">
+
+      <div class="label">
+        Temperatur
+      </div>
+
+      <div class="value">
+
+        <span id="temp">–</span>
+
+        <span class="unit">
+          °C
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="controls">
+
+    <button
+      class="action-button green"
+      id="onBtn"
+      onclick="switchPower(true)"
+      disabled>
+
+      EIN
+
+    </button>
+
+
+    <button
+      class="action-button dark"
+      id="offBtn"
+      onclick="switchPower(false)"
+      disabled>
+
+      AUS
+
+    </button>
+
+
+    <button
+      class="action-button light"
+      id="refreshBtn"
+      onclick="refreshAll()"
+      disabled>
+
+      Aktualisieren
+
+    </button>
+
+  </div>
+
+
+  <div
+    class="msg"
+    id="msg">
+
+    Verbindung wird hergestellt …
+
+  </div>
+
+</section>
+
+
+
+<!-- AUTOMATISCHE PROGRAMMIERUNG -->
+
+<section
+  class="card auto-card">
+
+  <div
+    class="cardhead blue-head">
+
+    <div>
+
+      <div class="title">
+        Automatische Programmierung
+      </div>
+
+      <div class="small">
+        Zeitzone: Europe/Berlin
+      </div>
+
+    </div>
+
+
+    <label class="scheduler-switch">
+
+      <input
+        type="checkbox"
+        id="schedulerEnabled"
+        onchange="toggleScheduler()"
+        disabled>
+
+      <strong
+        id="schedulerLabel">
+
+        AUS
+
+      </strong>
+
+    </label>
+
+  </div>
+
+
+  <div class="section">
+
+    <div
+      class="preview"
+      id="preview">
+
+      Aktueller Programmzustand wird geladen.
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- REGELMÄSSIGE PROGRAMMIERUNG -->
+
+<section
+  class="card regular-card">
+
+  <div
+    class="cardhead gold-head">
+
+    <div>
+
+      <div class="title">
+        Regelmäßige Programmierung
+      </div>
+
+      <div class="small">
+        Wochenplan mit individuellen Zeiten für jeden Tag
+      </div>
+
+    </div>
+
+
+    <button
+      class="save-regular"
+      id="saveRegularBtn"
+      onclick="saveRegular()"
+      disabled>
+
+      Speichern
+
+    </button>
+
+  </div>
+
+
+  <div class="section">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Tag
+          </th>
+
+          <th class="center">
+            Aktiv
+          </th>
+
+          <th>
+            EIN
+          </th>
+
+          <th>
+            AUS
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody
+        id="regularBody">
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
+
+
+
+<!-- INDIVIDUELLE PROGRAMMIERUNG -->
+
+<section
+  class="card individual-card">
+
+  <div
+    class="cardhead wine-head">
+
+    <div>
+
+      <div class="title">
+        Individuelle Programmierung
+      </div>
+
+      <div class="small">
+        Einmalige Termine haben Vorrang vor dem Wochenplan
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="section">
+
+
+    <div class="gridform">
+
+
+      <div class="field">
+
+        <label>
+          Datum
+        </label>
+
+        <input
+          id="indDate"
+          type="date">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Von
+        </label>
+
+        <input
+          id="indStart"
+          type="time"
+          value="19:00">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Bis
+        </label>
+
+        <input
+          id="indEnd"
+          type="time"
+          value="20:30">
+
+      </div>
+
+
+      <div class="field">
+
+        <label>
+          Zustand
+        </label>
+
+        <select id="indState">
+
+          <option value="on">
+            EIN
+          </option>
+
+          <option value="off">
+            AUS
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="field wide">
+
+        <label>
+          Notiz (optional)
+        </label>
+
+        <input
+          id="indNote"
+          maxlength="200"
+          placeholder="z. B. Abendveranstaltung">
+
+      </div>
+
+
+      <button
+        class="add-button"
+        id="addIndividualBtn"
+        onclick="addIndividual()"
+        disabled>
+
+        Termin hinzufügen
+
+      </button>
+
+
+    </div>
+
+
+    <div
+      id="conflictBox"
+      class="msg"
+      style="
+        display:none;
+        margin:16px 0 0;
+      ">
+    </div>
+
+
+  </div>
+
+
+  <div
+    class="section"
+    style="padding-top:0">
+
+
+    <div class="toolbar">
+
+      <strong>
+        Geplante Termine
+      </strong>
+
+      <span class="mini">
+        Abgelaufene Termine werden automatisch gelöscht.
+      </span>
+
+    </div>
+
+
+    <div id="individualList">
+
+      <div class="empty">
+        Noch keine Termine geladen.
+      </div>
+
+    </div>
+
+
+  </div>
+
+</section>
+
+
+
+<div class="footer">
+
+  Ausstellungssteuerung · Museum Wolfenbüttel
+
+</div>
+
+
+</div>
+
+
+
 <script>
-const WORKER="https://museum-shelly-bridge.feaga11.workers.dev";
-const $=id=>document.getElementById(id);
-let pin=sessionStorage.getItem("museumPanelPin")||"";
-let regularDays=[];
-let busy=false;
 
-if(pin){$("pin").value=pin;connect();}
 
-function headers(extra={}){return Object.assign({"X-Panel-Pin":pin},extra)}
-function showMsg(text,type=""){const el=$("msg");el.textContent=text;el.className="msg"+(type?" "+type:"")}
-function authEnable(v){["onBtn","offBtn","refreshBtn","schedulerEnabled","saveRegularBtn","addIndividualBtn"].forEach(id=>$(id).disabled=!v)}
-function setLocked(){authEnable(false);$("dot").className="dot err";$("state").textContent="GESPERRT"}
-function setDevice(output){$("dot").className="dot "+(output?"on":"off");$("state").textContent=output?"EIN":"AUS"}
+/* ==================================================
+   VERBINDUNG
+================================================== */
 
-async function api(path,opts={}){
-  opts.headers=headers(opts.headers||{});
-  const r=await fetch(WORKER+path,opts);
-  const d=await r.json().catch(()=>({}));
-  if(r.status===401) throw new Error("PIN ist falsch.");
-  if(!r.ok||d.ok===false) {
-    const e=new Error(d.error||("HTTP "+r.status)); e.status=r.status; e.data=d; throw e;
+
+const WORKER =
+  "https://museum-shelly-bridge.feaga11.workers.dev";
+
+
+const $ =
+  id =>
+    document.getElementById(id);
+
+
+let pin =
+  sessionStorage.getItem(
+    "museumPanelPin"
+  ) || "";
+
+
+let regularDays = [];
+
+let busy = false;
+
+
+/* Ohne vorherige Anmeldung zurück */
+
+if(!pin){
+
+  location.href =
+    "index.html";
+
+}else{
+
+  connect();
+
+}
+
+
+/* ==================================================
+   API
+================================================== */
+
+
+function headers(extra={}){
+
+  return Object.assign(
+    {
+      "X-Panel-Pin":pin
+    },
+    extra
+  );
+}
+
+
+function showMsg(
+  text,
+  type=""
+){
+
+  const el =
+    $("msg");
+
+  el.textContent =
+    text;
+
+  el.className =
+    "msg" +
+    (
+      type
+        ? " " + type
+        : ""
+    );
+}
+
+
+function authEnable(v){
+
+  [
+    "onBtn",
+    "offBtn",
+    "refreshBtn",
+    "schedulerEnabled",
+    "saveRegularBtn",
+    "addIndividualBtn"
+  ]
+  .forEach(
+    id =>
+      $(id).disabled =
+        !v
+  );
+}
+
+
+function setLocked(){
+
+  authEnable(false);
+
+  $("dot").className =
+    "dot err";
+
+  $("state").textContent =
+    "GESPERRT";
+}
+
+
+function setDevice(output){
+
+  $("dot").className =
+    "dot " +
+    (
+      output
+        ? "on"
+        : "off"
+    );
+
+  $("state").textContent =
+    output
+      ? "EIN"
+      : "AUS";
+}
+
+
+async function api(
+  path,
+  opts={}
+){
+
+  opts.headers =
+    headers(
+      opts.headers || {}
+    );
+
+  const r =
+    await fetch(
+      WORKER + path,
+      opts
+    );
+
+  const d =
+    await r
+      .json()
+      .catch(
+        ()=>({})
+      );
+
+
+  if(
+    r.status === 401
+  ){
+
+    throw new Error(
+      "PIN ist falsch."
+    );
   }
+
+
+  if(
+    !r.ok ||
+    d.ok === false
+  ){
+
+    const e =
+      new Error(
+        d.error ||
+        (
+          "HTTP " +
+          r.status
+        )
+      );
+
+    e.status =
+      r.status;
+
+    e.data =
+      d;
+
+    throw e;
+  }
+
+
   return d;
 }
 
+
+/* ==================================================
+   VERBINDUNG
+================================================== */
+
+
 async function connect(){
-  pin=$("pin").value.trim();
-  if(!pin){showMsg("Bitte PIN eingeben.","error");return}
-  sessionStorage.setItem("museumPanelPin",pin);
-  showMsg("Verbindung wird geprüft …");
+
+  showMsg(
+    "Verbindung wird hergestellt …"
+  );
+
   try{
+
     await refreshAll();
+
     authEnable(true);
-    showMsg("Verbindung steht.");
-  }catch(e){
-    setLocked();showMsg(e.message,"error");
+
+    showMsg(
+      "Verbindung steht."
+    );
+
+  }
+  catch(e){
+
+    setLocked();
+
+    showMsg(
+      e.message,
+      "error"
+    );
   }
 }
 
+
 async function refreshAll(){
-  await Promise.all([loadStatus(),loadRegular(),loadIndividual(),loadPreview()]);
+
+  await Promise.all(
+    [
+      loadStatus(),
+      loadRegular(),
+      loadIndividual(),
+      loadPreview()
+    ]
+  );
+
   authEnable(true);
 }
 
+
+/* ==================================================
+   STATUS
+================================================== */
+
+
 async function loadStatus(){
-  const d=await api("/api/status",{cache:"no-store"});
-  if(!d.online) throw new Error("Shelly Cloud meldet die Steckdose als offline.");
-  setDevice(!!d.output);
-  $("power").textContent=Number(d.apower??0).toFixed(1);
-  $("voltage").textContent=d.voltage==null?"–":Number(d.voltage).toFixed(1);
-  $("current").textContent=d.current==null?"–":Number(d.current).toFixed(3);
-  $("temp").textContent=d.temperature==null?"–":Number(d.temperature).toFixed(1);
-  $("updated").textContent="Aktualisiert: "+new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+
+  const d =
+    await api(
+      "/api/status",
+      {
+        cache:"no-store"
+      }
+    );
+
+
+  if(
+    !d.online
+  ){
+
+    throw new Error(
+      "Shelly Cloud meldet die Steckdose als offline."
+    );
+  }
+
+
+  setDevice(
+    !!d.output
+  );
+
+
+  $("power").textContent =
+    Number(
+      d.apower ?? 0
+    ).toFixed(1);
+
+
+  $("voltage").textContent =
+    d.voltage == null
+      ? "–"
+      : Number(
+          d.voltage
+        ).toFixed(1);
+
+
+  $("current").textContent =
+    d.current == null
+      ? "–"
+      : Number(
+          d.current
+        ).toFixed(3);
+
+
+  $("temp").textContent =
+    d.temperature == null
+      ? "–"
+      : Number(
+          d.temperature
+        ).toFixed(1);
+
+
+  $("updated").textContent =
+    "Aktualisiert: " +
+    new Date()
+      .toLocaleTimeString(
+        "de-DE",
+        {
+          hour:"2-digit",
+          minute:"2-digit",
+          second:"2-digit"
+        }
+      );
 }
+
+
+/* ==================================================
+   EIN / AUS
+================================================== */
+
 
 async function switchPower(on){
-  if(busy)return; busy=true;
+
+  if(busy){
+    return;
+  }
+
+  busy = true;
+
+
   try{
-    await api("/api/switch",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({on})});
-    await new Promise(r=>setTimeout(r,500)); await loadStatus();
-    showMsg(on?"Bürger Vitrine wurde eingeschaltet.":"Bürger Vitrine wurde ausgeschaltet.");
-  }catch(e){showMsg(e.message,"error")}finally{busy=false}
+
+    await api(
+      "/api/switch",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify(
+            {
+              on
+            }
+          )
+      }
+    );
+
+
+    await new Promise(
+      r =>
+        setTimeout(
+          r,
+          500
+        )
+    );
+
+
+    await loadStatus();
+
+
+    showMsg(
+      on
+        ? "Bürger Vitrine wurde eingeschaltet."
+        : "Bürger Vitrine wurde ausgeschaltet."
+    );
+
+  }
+  catch(e){
+
+    showMsg(
+      e.message,
+      "error"
+    );
+
+  }
+  finally{
+
+    busy = false;
+  }
 }
 
+
+/* ==================================================
+   REGELMÄSSIGE PROGRAMMIERUNG
+================================================== */
+
+
 async function loadRegular(){
-  const d=await api("/api/schedule/regular",{cache:"no-store"});
-  regularDays=d.days||[];
-  $("schedulerEnabled").checked=!!d.scheduler_enabled;
+
+  const d =
+    await api(
+      "/api/schedule/regular",
+      {
+        cache:"no-store"
+      }
+    );
+
+
+  regularDays =
+    d.days || [];
+
+
+  $("schedulerEnabled").checked =
+    !!d.scheduler_enabled;
+
+
   updateSchedulerLabel();
+
   renderRegular();
 }
 
+
 function renderRegular(){
-  $("regularBody").innerHTML=regularDays.map(day=>`
-    <tr data-day="${day.weekday}">
-      <td><strong>${day.day_name}</strong></td>
-      <td class="center"><input class="reg-enabled" type="checkbox" ${day.enabled?"checked":""}></td>
-      <td><input class="reg-on" type="time" value="${day.on_time}"></td>
-      <td><input class="reg-off" type="time" value="${day.off_time}"></td>
-    </tr>`).join("");
+
+  $("regularBody").innerHTML =
+
+    regularDays
+      .map(
+        day => `
+
+          <tr
+            data-day="${day.weekday}">
+
+            <td>
+              <strong>
+                ${day.day_name}
+              </strong>
+            </td>
+
+            <td class="center">
+
+              <input
+                class="reg-enabled"
+                type="checkbox"
+                ${day.enabled
+                  ? "checked"
+                  : ""}>
+
+            </td>
+
+            <td>
+
+              <input
+                class="reg-on"
+                type="time"
+                value="${day.on_time}">
+
+            </td>
+
+            <td>
+
+              <input
+                class="reg-off"
+                type="time"
+                value="${day.off_time}">
+
+            </td>
+
+          </tr>
+
+        `
+      )
+      .join("");
 }
+
 
 function readRegularFromTable(){
-  return [...document.querySelectorAll("#regularBody tr")].map(tr=>({
-    weekday:Number(tr.dataset.day),
-    enabled:tr.querySelector(".reg-enabled").checked,
-    on_time:tr.querySelector(".reg-on").value,
-    off_time:tr.querySelector(".reg-off").value
-  }));
+
+  return [
+
+    ...document
+      .querySelectorAll(
+        "#regularBody tr"
+      )
+
+  ]
+  .map(
+    tr => ({
+
+      weekday:
+        Number(
+          tr.dataset.day
+        ),
+
+      enabled:
+        tr
+          .querySelector(
+            ".reg-enabled"
+          )
+          .checked,
+
+      on_time:
+        tr
+          .querySelector(
+            ".reg-on"
+          )
+          .value,
+
+      off_time:
+        tr
+          .querySelector(
+            ".reg-off"
+          )
+          .value
+
+    })
+  );
 }
+
 
 async function saveRegular(){
-  try{
-    const days=readRegularFromTable();
-    await api("/api/schedule/regular",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({days,scheduler_enabled:$("schedulerEnabled").checked})});
-    showMsg("Regelmäßige Programmierung gespeichert.");
-    await loadRegular(); await loadPreview();
-  }catch(e){showMsg(e.message,"error")}
-}
 
-function updateSchedulerLabel(){
-  $("schedulerLabel").textContent=$("schedulerEnabled").checked?"EIN":"AUS";
-}
-
-async function toggleScheduler(){
-  updateSchedulerLabel();
   try{
-    await api("/api/schedule/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({scheduler_enabled:$("schedulerEnabled").checked})});
-    showMsg($("schedulerEnabled").checked?"Automatische Programmierung ist eingeschaltet.":"Automatische Programmierung ist ausgeschaltet.");
+
+    const days =
+      readRegularFromTable();
+
+
+    await api(
+      "/api/schedule/regular",
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify(
+            {
+              days,
+
+              scheduler_enabled:
+                $("schedulerEnabled")
+                  .checked
+            }
+          )
+      }
+    );
+
+
+    showMsg(
+      "Regelmäßige Programmierung gespeichert."
+    );
+
+
+    await loadRegular();
+
     await loadPreview();
-  }catch(e){
-    $("schedulerEnabled").checked=!$("schedulerEnabled").checked;updateSchedulerLabel();showMsg(e.message,"error");
+
+  }
+  catch(e){
+
+    showMsg(
+      e.message,
+      "error"
+    );
   }
 }
 
-async function loadPreview(){
-  const d=await api("/api/schedule/preview",{cache:"no-store"});
-  const state=d.on?"EIN":"AUS";
-  let src=d.source||"";
-  if(src.startsWith("individual:")) src="Individueller Termin";
-  else if(src.startsWith("regular:")) src="Regelmäßige Programmierung";
-  $("preview").innerHTML=`Jetzt: <strong>${state}</strong> · Quelle: <strong>${src||"–"}</strong> · Lokale Zeit: <strong>${d.now||"–"}</strong>`;
+
+/* ==================================================
+   AUTOMATIK
+================================================== */
+
+
+function updateSchedulerLabel(){
+
+  $("schedulerLabel").textContent =
+    $("schedulerEnabled")
+      .checked
+      ? "EIN"
+      : "AUS";
 }
 
-async function addIndividual(){
-  const date=$("indDate").value, start=$("indStart").value, end=$("indEnd").value;
-  const desired_state=$("indState").value==="on", note=$("indNote").value.trim();
-  if(!date||!start||!end){showConflict("Bitte Datum, Von und Bis vollständig eingeben.","error");return}
-  const payload={start_local:`${date}T${start}`,end_local:`${date}T${end}`,desired_state,note};
+
+async function toggleScheduler(){
+
+  updateSchedulerLabel();
+
 
   try{
-    const check=await api("/api/schedule/individual/check",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
-    let force=false;
-    if(check.conflict){
-      const detail=check.details?.message||"Konflikt mit der regelmäßigen Programmierung.";
-      showConflict(detail+" Der individuelle Termin hat Vorrang.","warn");
-      force=confirm(detail+"\n\nDer individuelle Termin hat Vorrang. Trotzdem speichern?");
-      if(!force) return;
-    }else{
+
+    await api(
+      "/api/schedule/settings",
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify(
+            {
+              scheduler_enabled:
+                $("schedulerEnabled")
+                  .checked
+            }
+          )
+      }
+    );
+
+
+    showMsg(
+
+      $("schedulerEnabled")
+        .checked
+
+        ? "Automatische Programmierung ist eingeschaltet."
+
+        : "Automatische Programmierung ist ausgeschaltet."
+
+    );
+
+
+    await loadPreview();
+
+  }
+  catch(e){
+
+    $("schedulerEnabled").checked =
+      !$("schedulerEnabled").checked;
+
+    updateSchedulerLabel();
+
+    showMsg(
+      e.message,
+      "error"
+    );
+  }
+}
+
+
+/* ==================================================
+   PROGRAMMVORSCHAU
+================================================== */
+
+
+async function loadPreview(){
+
+  const d =
+    await api(
+      "/api/schedule/preview",
+      {
+        cache:"no-store"
+      }
+    );
+
+
+  const state =
+    d.on
+      ? "EIN"
+      : "AUS";
+
+
+  let src =
+    d.source || "";
+
+
+  if(
+    src.startsWith(
+      "individual:"
+    )
+  ){
+
+    src =
+      "Individueller Termin";
+
+  }
+  else if(
+    src.startsWith(
+      "regular:"
+    )
+  ){
+
+    src =
+      "Regelmäßige Programmierung";
+  }
+
+
+  $("preview").innerHTML =
+
+    `Jetzt:
+     <strong>${state}</strong>
+     &nbsp;·&nbsp;
+     Quelle:
+     <strong>${src || "–"}</strong>
+     &nbsp;·&nbsp;
+     Lokale Zeit:
+     <strong>${d.now || "–"}</strong>`;
+}
+
+
+/* ==================================================
+   INDIVIDUELLE PROGRAMMIERUNG
+================================================== */
+
+
+async function addIndividual(){
+
+  const date =
+    $("indDate").value;
+
+  const start =
+    $("indStart").value;
+
+  const end =
+    $("indEnd").value;
+
+
+  const desired_state =
+    $("indState").value === "on";
+
+
+  const note =
+    $("indNote")
+      .value
+      .trim();
+
+
+  if(
+    !date ||
+    !start ||
+    !end
+  ){
+
+    showConflict(
+      "Bitte Datum, Von und Bis vollständig eingeben.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const payload = {
+
+    start_local:
+      `${date}T${start}`,
+
+    end_local:
+      `${date}T${end}`,
+
+    desired_state,
+
+    note
+  };
+
+
+  try{
+
+    const check =
+      await api(
+        "/api/schedule/individual/check",
+        {
+
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify(
+              payload
+            )
+        }
+      );
+
+
+    let force =
+      false;
+
+
+    if(
+      check.conflict
+    ){
+
+      const detail =
+        check.details?.message ||
+        "Konflikt mit der regelmäßigen Programmierung.";
+
+
+      showConflict(
+        detail +
+        " Der individuelle Termin hat Vorrang.",
+        "warn"
+      );
+
+
+      force =
+        confirm(
+
+          detail +
+
+          "\n\nDer individuelle Termin hat Vorrang. Trotzdem speichern?"
+
+        );
+
+
+      if(
+        !force
+      ){
+        return;
+      }
+
+    }
+    else{
+
       hideConflict();
     }
 
-    await api("/api/schedule/individual",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...payload,force})});
-    $("indNote").value="";
-    showMsg("Individueller Termin gespeichert.");
-    await loadIndividual(); await loadPreview();
-  }catch(e){
-    if(e.status===409){
-      const detail=e.data?.details?.message||e.message;
-      const force=confirm(detail+"\n\nTrotzdem speichern?");
-      if(force){
-        await api("/api/schedule/individual",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...payload,force:true})});
-        await loadIndividual(); await loadPreview(); showMsg("Individueller Termin trotz Konflikt gespeichert.");
+
+    await api(
+      "/api/schedule/individual",
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify(
+            {
+              ...payload,
+              force
+            }
+          )
       }
-    }else showConflict(e.message,"error");
+    );
+
+
+    $("indNote").value =
+      "";
+
+
+    showMsg(
+      "Individueller Termin gespeichert."
+    );
+
+
+    await loadIndividual();
+
+    await loadPreview();
+
+  }
+  catch(e){
+
+    if(
+      e.status === 409
+    ){
+
+      const detail =
+        e.data?.details?.message ||
+        e.message;
+
+
+      const force =
+        confirm(
+
+          detail +
+
+          "\n\nTrotzdem speichern?"
+
+        );
+
+
+      if(
+        force
+      ){
+
+        await api(
+          "/api/schedule/individual",
+          {
+
+            method:"POST",
+
+            headers:{
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify(
+                {
+                  ...payload,
+                  force:true
+                }
+              )
+          }
+        );
+
+
+        await loadIndividual();
+
+        await loadPreview();
+
+
+        showMsg(
+          "Individueller Termin trotz Konflikt gespeichert."
+        );
+      }
+
+    }
+    else{
+
+      showConflict(
+        e.message,
+        "error"
+      );
+    }
   }
 }
 
-function showConflict(text,type="warn"){const el=$("conflictBox");el.style.display="block";el.textContent=text;el.className="msg "+type}
-function hideConflict(){$("conflictBox").style.display="none"}
+
+function showConflict(
+  text,
+  type="warn"
+){
+
+  const el =
+    $("conflictBox");
+
+
+  el.style.display =
+    "block";
+
+
+  el.textContent =
+    text;
+
+
+  el.className =
+    "msg " +
+    type;
+}
+
+
+function hideConflict(){
+
+  $("conflictBox")
+    .style
+    .display =
+      "none";
+}
+
+
+/* ==================================================
+   INDIVIDUELLE TERMINE LADEN
+================================================== */
+
 
 async function loadIndividual(){
-  const d=await api("/api/schedule/individual",{cache:"no-store"});
-  const items=d.items||[];
-  if(!items.length){$("individualList").innerHTML='<div class="empty">Keine zukünftigen individuellen Termine.</div>';return}
-  $("individualList").innerHTML=`
-    <table><thead><tr><th>Datum</th><th>Von</th><th>Bis</th><th>Zustand</th><th>Notiz</th><th></th></tr></thead>
-    <tbody>${items.map(i=>{
-      const [date,start]=i.start_local.split("T"), end=i.end_local.split("T")[1];
-      const dd=date.split("-").reverse().join(".");
-      return `<tr><td>${dd}</td><td>${start}</td><td>${end}</td><td><strong>${i.desired_state?"EIN":"AUS"}</strong></td><td>${escapeHtml(i.note||"")}</td><td class="actions"><button class="red" onclick="deleteIndividual(${i.id})">Löschen</button></td></tr>`
-    }).join("")}</tbody></table>`;
+
+  const d =
+    await api(
+      "/api/schedule/individual",
+      {
+        cache:"no-store"
+      }
+    );
+
+
+  const items =
+    d.items || [];
+
+
+  if(
+    !items.length
+  ){
+
+    $("individualList").innerHTML =
+
+      '<div class="empty">Keine zukünftigen individuellen Termine.</div>';
+
+    return;
+  }
+
+
+  $("individualList").innerHTML = `
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Datum
+          </th>
+
+          <th>
+            Von
+          </th>
+
+          <th>
+            Bis
+          </th>
+
+          <th>
+            Zustand
+          </th>
+
+          <th>
+            Notiz
+          </th>
+
+          <th></th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${
+          items
+            .map(
+              i => {
+
+                const [
+                  date,
+                  start
+                ] =
+                  i.start_local
+                    .split("T");
+
+
+                const end =
+                  i.end_local
+                    .split("T")[1];
+
+
+                const dd =
+                  date
+                    .split("-")
+                    .reverse()
+                    .join(".");
+
+
+                return `
+
+                  <tr>
+
+                    <td>
+                      ${dd}
+                    </td>
+
+                    <td>
+                      ${start}
+                    </td>
+
+                    <td>
+                      ${end}
+                    </td>
+
+                    <td>
+
+                      <strong>
+
+                        ${
+                          i.desired_state
+                            ? "EIN"
+                            : "AUS"
+                        }
+
+                      </strong>
+
+                    </td>
+
+                    <td>
+
+                      ${
+                        escapeHtml(
+                          i.note || ""
+                        )
+                      }
+
+                    </td>
+
+                    <td class="actions">
+
+                      <button
+                        class="delete-button"
+                        onclick="deleteIndividual(${i.id})">
+
+                        Löschen
+
+                      </button>
+
+                    </td>
+
+                  </tr>
+
+                `;
+              }
+            )
+            .join("")
+        }
+
+      </tbody>
+
+    </table>
+
+  `;
 }
+
+
+/* ==================================================
+   TERMIN LÖSCHEN
+================================================== */
+
 
 async function deleteIndividual(id){
-  if(!confirm("Diesen individuellen Termin wirklich löschen?"))return;
+
+  if(
+    !confirm(
+      "Diesen individuellen Termin wirklich löschen?"
+    )
+  ){
+    return;
+  }
+
+
   try{
-    await api("/api/schedule/individual/"+id,{method:"DELETE"});
-    await loadIndividual(); await loadPreview(); showMsg("Termin gelöscht.");
-  }catch(e){showMsg(e.message,"error")}
+
+    await api(
+      "/api/schedule/individual/" +
+      id,
+      {
+        method:"DELETE"
+      }
+    );
+
+
+    await loadIndividual();
+
+    await loadPreview();
+
+
+    showMsg(
+      "Termin gelöscht."
+    );
+
+  }
+  catch(e){
+
+    showMsg(
+      e.message,
+      "error"
+    );
+  }
 }
 
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]))}
 
-const today=new Date(); $("indDate").value=[today.getFullYear(),String(today.getMonth()+1).padStart(2,"0"),String(today.getDate()).padStart(2,"0")].join("-");
-setInterval(()=>{if(pin)loadStatus().catch(()=>{})},10000);
+/* ==================================================
+   HTML SCHUTZ
+================================================== */
+
+
+function escapeHtml(s){
+
+  return String(s)
+    .replace(
+      /[&<>"']/g,
+      c => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        "\"":"&quot;",
+        "'":"&#039;"
+      }[c])
+    );
+}
+
+
+/* ==================================================
+   STANDARDDATUM
+================================================== */
+
+
+const today =
+  new Date();
+
+
+$("indDate").value = [
+
+  today.getFullYear(),
+
+  String(
+    today.getMonth() + 1
+  ).padStart(
+    2,
+    "0"
+  ),
+
+  String(
+    today.getDate()
+  ).padStart(
+    2,
+    "0"
+  )
+
+].join("-");
+
+
+/* ==================================================
+   STATUS AUTOMATISCH AKTUALISIEREN
+================================================== */
+
+
+setInterval(
+  ()=>{
+
+    if(
+      pin
+    ){
+
+      loadStatus()
+        .catch(
+          ()=>{}
+        );
+    }
+
+  },
+  10000
+);
+
+
 </script>
+
+
 </body>
 </html>
